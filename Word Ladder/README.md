@@ -15,4 +15,7 @@
 Word Ladder 控制台程序
 
 
+### 示例
+
+
 ![dd](https://raw.githubusercontent.com/RoyLJH/Toys-and-fun/master/Word%20Ladder/Pic.jpg)
