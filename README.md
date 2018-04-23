@@ -30,6 +30,6 @@ My playground.
     
 -----------------------
 ### Maze
-[Maze]()
+[Maze](https://github.com/RoyLJH/Toys-and-fun/tree/master/Maze)
 
   OpenGL implemention Maze Game.
