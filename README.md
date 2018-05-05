@@ -6,6 +6,7 @@ My playground.
 -------------------------
 * [Word Ladder](#word-ladder)
 * [Maze](#maze)
+* [Krakout Game](#krakout)
 
 -------------------
 ### Word Ladder
@@ -33,3 +34,9 @@ My playground.
 [Maze](https://github.com/RoyLJH/Toys-and-fun/tree/master/Maze)
 
   OpenGL implemention Maze Game.
+
+### Krakout
+[Krakout](https://github.com/RoyLJH/Toys-and-fun/tree/master/Krakout)
+
+  OpenGL implemetion Krakout Game.
+  
