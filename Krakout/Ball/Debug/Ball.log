@@ -1,0 +1,8 @@
+﻿  Source.cpp
+e:\programming\c++workbench\computer graphics\ball\ball\ball\source.cpp(140): warning C4804: '<': unsafe use of type 'bool' in operation
+e:\programming\c++workbench\computer graphics\ball\ball\ball\source.cpp(141): warning C4804: '<=': unsafe use of type 'bool' in operation
+e:\programming\c++workbench\computer graphics\ball\ball\ball\source.cpp(147): warning C4804: '<=': unsafe use of type 'bool' in operation
+e:\programming\c++workbench\computer graphics\ball\ball\ball\source.cpp(148): warning C4804: '<': unsafe use of type 'bool' in operation
+e:\programming\c++workbench\computer graphics\ball\ball\ball\source.cpp(298): warning C4804: '<=': unsafe use of type 'bool' in operation
+  Ball.vcxproj -> E:\programming\C++workbench\Computer Graphics\Ball\Ball\Debug\Ball.exe
+  Ball.vcxproj -> E:\programming\C++workbench\Computer Graphics\Ball\Ball\Debug\Ball.pdb (Full PDB)
