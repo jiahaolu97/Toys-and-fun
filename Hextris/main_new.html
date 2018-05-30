@@ -1,0 +1,600 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>无标题文档</title>
+    <style type="text/css">
+        #myCanvas {
+            border: 0px solid black;  margin: auto; text-align: center;position: absolute;left: 0;right: 0;
+        }
+    </style>
+</head>
+
+<body>
+<canvas id="myCanvas"  width="1000px" height="800px" > </canvas>
+
+</body>
+
+<script type="text/javascript">
+    var canvas = document.querySelector('#myCanvas'),
+        context = canvas.getContext('2d');
+    canvas.width = window.innerWidth*0.9;
+    canvas.height = window.innerHeight*0.9;
+    var getDegree = function(vertices, index) {
+        return 360 / vertices * (index + 0.5) + 90;
+    }
+
+    var getRadian = function(degree) {
+        return degree * Math.PI / 180;
+    };
+
+    var drawSix = function(ctx,length,vertices,color,deg){//绘制六边形
+        ctx.save();
+        ctx.translate(0.45*window.innerWidth,0.45*window.innerHeight);
+        ctx.rotate(deg*Math.PI/180);
+        ctx.translate(-0.45*window.innerWidth,-0.45*window.innerHeight);
+        ctx.beginPath();
+        for (var i = 0; i < vertices; i++) {
+            // 计算偏转
+            var degree = getDegree(vertices, i),
+                radian = getRadian(degree);
+
+            // 增加1/3的canvas大小位移量以免被边缘挡住
+            var x = Math.cos(radian) * length + 0.45*window.innerWidth;
+            var y = Math.sin(radian) * length + 0.45*window.innerHeight;
+            ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        ctx.fillStyle=color;
+        ctx.fill();
+        ctx.restore();
+    }
+
+    var drawTrapezoid = function(ctx,posx,posy,deg,wid,heig,color,alpha){//绘制梯形，位置、旋转角、短边长、高
+        ctx.save();
+        ctx.translate(0.45*window.innerWidth,0.45*window.innerHeight);
+        ctx.rotate(deg*Math.PI/180);
+        ctx.translate(-0.45*window.innerWidth,-0.45*window.innerHeight);
+        ctx.beginPath();
+        ctx.lineTo(posx-0.5*wid-heig/Math.sqrt(3),posy-0.5*heig);
+        ctx.lineTo(posx-0.5*wid,posy+0.5*heig);
+        ctx.lineTo(posx+0.5*wid,posy+0.5*heig);
+        ctx.lineTo(posx+0.5*wid+heig/Math.sqrt(3),posy-0.5*heig);
+        ctx.closePath();
+        ctx.restore();
+        ctx.lineWidth = 0.2;
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle="white";
+        ctx.stroke();
+        ctx.fillStyle=color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+
+    var current = 0;//当前旋转角
+    var past = 0;//上一个旋转角
+    var drawT = function(ctx,x,y,colorIDX,alpha){
+        var posy = window.innerHeight*0.45-50*Math.sqrt(3)-0.5*block_height-y*block_height;
+        var wid = 100 + y * block_height * 2 / Math.sqrt(3);
+        var deg = past -60*x;
+        var color = colorsum[colorIDX];
+        window.drawTrapezoid(ctx,0.45*window.innerWidth,posy,deg,wid,block_height,color,alpha);
+    }
+
+    window.drawSix(context,250,6,"rgb(200,200,200)",0);
+    window.drawSix(context,100,6,"rgb(80,80,80)",0);
+
+
+    var isStarted = false;//游戏是否开始
+	var isPushed = false;//是否按下开始键
+	var pushtime = 0;//从按下开始键后开始计时
+	var isOver = false;//游戏是否结束
+	var isPaused = false;//游戏是否暂停
+	var score = 0;//积分
+	var pauseimg = new Image();
+	var playimg = new Image();
+	pauseimg.src = "pause.jpg";
+	playimg.src = "play.jpg";
+	
+	window.onload = function(){
+		 document.onkeydown = function(ev){
+			 if(isStarted && isOver == false && isPaused == false){
+				var oEvent=ev||event;
+				if(ev.keyCode==37)//向左
+				{
+					current = (current - 60);
+					past = current + 60;
+				}
+				else if(ev.keyCode==39)//向右
+				{
+					current = current + 60;
+					past = current -60;
+				}
+                else if(ev.keyCode==65 && updaterate >= 0.1)//A 变慢
+                {
+                    updaterate -= 0.1;
+
+                }
+                else if(ev.keyCode == 68)  // D 变快
+                {
+                    updaterate += 0.1;
+                }
+			 }
+        }
+		window.onclick = function(){
+			var e = event || window.event; 
+			if(isStarted == false){
+				if(e.clientX >= (0.5*window.innerWidth - 100) && e.clientX <= (0.5*window.innerWidth + 100) && e.clientY >= (0.45*window.innerHeight - 85) && e.clientY <= (0.45*window.innerHeight + 85)){
+					isPushed = true;
+				}
+			}
+			else if(isStarted && isOver == false && isPaused == false){
+	//			console.log(window.innerWidth);
+				if(e.clientX >= (0.95*window.innerWidth - 50) && e.clientX <= (0.95*window.innerWidth) && e.clientY >= (0.9*window.innerHeight - 50) && e.clientY <= (0.9*window.innerHeight)){
+                    isPaused = true;
+                    pastTime = clock;
+                }
+				else{
+					if(e.clientX<window.innerWidth*0.5){
+						current = (current - 60);
+						past = current + 60;
+					}
+					else{
+						current = current + 60;
+						past = current - 60;
+					}
+				}
+			}else if(isStarted && isOver == false && isPaused){
+				if(e.clientX >= (0.95*window.innerWidth - 50) && e.clientX <= (0.95*window.innerWidth) && e.clientY >= (0.9*window.innerHeight - 50) && e.clientY <= (0.9*window.innerHeight)){
+                    isPaused = false;
+                    startTime = Date.parse(new Date());
+                }
+			}
+		}
+	}
+
+    var total = 48;//总共能容纳方块的个数
+    var block_height = 15;//方块的高度
+    var posys = 50;//每个方块的纵坐标变化
+    var wids = (window.innerHeight*0.45-50 - 0.5*block_height - 50 * Math.sqrt(3))*2/Math.sqrt(3) +100;//每个方块的宽度变化
+    var inittowards = Math.floor(Math.random()*(5+1));//每个方块的初始朝向
+    var degs = -60*inittowards;//每个方块的旋转变化
+    var colorsum = ["red","blue","rgb(0,200,0)","yellow"];
+    var colorindex = Math.floor(Math.random()*(3+1));//随机颜色
+    //	var table = [[-1,-1,-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1,-1,-1]];//完成下落的方块
+    var water = new Map();
+    var ice = new Map();
+    var table = new Array();
+    var melting = false;
+    var meltingAlpha = 1.0;
+    var meltingColorIDX = -1;
+    var meltingHole = [0,0,0,0,0,0];
+    var falling = false;
+    var MaxFallingCount = 15;
+    var fallingcount = MaxFallingCount;
+    var removeSet = new Set();
+    var updaterate = 0.5;
+    var clock = 0;
+    var pastTime = 0;
+    var startTime = Date.parse(new Date())/1000;
+    var endTime = Date.parse(new Date())/1000;
+    for(var i=0;i<6;i++){
+        table[i] = new Array();
+        for(var j=0;j<8;j++){
+            table[i][j] = -1;
+        }
+    }
+
+
+//    for(var x = 0;x<total;x++){//初始化
+//        posys[x] = 50;
+//    }
+//    for (var x = 0;x<total;x++)
+//        wids[x] = (window.innerHeight*0.45-posys[x] - 0.5*block_height - 50 * Math.sqrt(3))*2/Math.sqrt(3) +100;
+//    for(var x = 0;x<total;x++)
+//        inittowards[x] = Math.floor(Math.random()*(5+1));
+//    for(var x = 0;x<total;x++)
+//        degs[x] = -60*inittowards[x];
+//    for(var x = 0;x<total;x++)
+//        colorindex[x] = Math.floor(Math.random()*(3+1));
+
+    var removeTimes = 0
+
+    var removeAll = function () {
+        removeSet.forEach(function (t, p2, p3) {
+           var x = Math.floor(t/10);
+           var y = t%10;
+           var curMeltingColor = table[x][y];
+           if(curMeltingColor!=-1 && !water.has(t)) {
+               var stack = new Array();
+               var tmp = new Set();
+               stack.push(t);
+               tmp.add(t);
+               while (stack.length > 0) {
+                   var cur = stack.pop();
+                   var ix = Math.floor(cur / 10);
+                   var iy = cur % 10;
+                   var left = 0;
+                   var right = 0;
+                   var down = iy - 1;
+                   var up = iy + 1;
+                   if (ix == 0) left = 5;
+                   else left = ix - 1;
+                   if (ix == 5) right = 0;
+                   else right = ix + 1;
+                   if (table[left][iy] == curMeltingColor && !tmp.has(left * 10 + iy)) {
+                       tmp.add(left * 10 + iy);
+                       stack.push(left * 10 + iy);
+                   }
+                   if (table[right][iy] == curMeltingColor && !tmp.has(right * 10 + iy)) {
+                       tmp.add(right * 10 + iy);
+                       stack.push(right * 10 + iy);
+                   }
+                   if (down != -1 && table[ix][down] == curMeltingColor && !tmp.has(ix * 10 + down)) {
+                       tmp.add(ix * 10 + down);
+                       stack.push(ix * 10 + down);
+                   }
+                   if (up != 8 && table[ix][up] == curMeltingColor && !tmp.has(ix * 10 + up)) {
+                       tmp.add(ix * 10 + up);
+                       stack.push(ix * 10 + up);
+                   }
+               }
+               if (tmp.size >= 3) {
+                   tmp.forEach(function (t, p, p) {
+                       water.set(t,curMeltingColor);
+                   });
+               }
+               tmp.clear();
+           }
+        });
+        if(water.size>0){
+            for(var i=0;i<6;i++){
+                var downcrack = false;
+                for(var j=0;j<8;j++){
+                    var t = i*10+j;
+                    if(water.has(t)){
+                        score += 10;
+                        meltingHole[i]++;
+                        table[i][j] = -1;
+                        downcrack = true;
+                    }else{
+                        if(downcrack){
+                            ice.set(t,table[i][j]);
+                            table[i][j] = -1;
+                        }else{
+                            continue;
+                        }
+                    }
+                }
+            }
+            melting = true;
+            falling = true;
+        }
+        //               if(tmp.size>=3){
+//                   melting = true;
+//                   falling = false;
+//                   score += tmp.size*10;
+//                   meltingColorIDX = curMeltingColor;
+////            alert("当前消除颜色是:"+colorsum[meltingColorIDX]+",要消除的块有"+tmp.size+"个");
+//                   tmp.forEach(function (t, p2, p3) {
+//                       water.add(t);
+//                       var ix = Math.floor(t/10);
+//                       var iy = t%10;
+////                if(meltingHole[ix]==0){
+////                    alert(ix);
+////                }
+//                       meltingHole[ix]++;
+//                       console.log(meltingHole[ix]);
+//                       for(var k=7;k>iy;k--) {
+//                           if ( (table[ix][k] != -1 && table[ix][k] != meltingColorIDX) || !tmp.has(t)){
+//                               ice.set(10 * ix + k,table[ix][k]);
+//                               table[ix][k] = -1;
+//                           }
+//                       }
+//                       table[ix][iy] = -1;
+//                   });
+//                   tmp.clear();
+//               }
+    }
+
+    var remove = function (x,y) {  //remove 方法 接收下落下来的一个新滑块 并消除其连通域。 如果是雪崩的话请多次调用该方法。
+        // 返回的是新的table数组 和 两个set 。
+        // 用异步的动画方法画出消融的块。和下降的块。
+        removeTimes++;
+//        console.log("remove!"+removeTimes);
+        var curMeltingColor = table[x][y];
+        if(curMeltingColor == -1) return;
+        var stack = new Array();
+        var tmp = new Set();
+        stack.push(10*x+y);
+        tmp.add(10*x+y);
+        while(stack.length >0){
+            var cur = stack.pop();
+            var ix = Math.floor(cur/10);
+            var iy = cur%10;
+            var left = 0;
+            var right = 0;
+            var down = iy-1;
+            var up = iy+1;
+            if(ix==0) left = 5;
+            else left = ix-1;
+            if(ix==5) right = 0;
+            else right = ix+1;
+            if(table[left][iy] == curMeltingColor && !tmp.has(left*10+iy)){
+                tmp.add(left*10+iy);
+                stack.push(left*10+iy);
+            }
+            if(table[right][iy] == curMeltingColor && !tmp.has(right*10+iy)) {
+                tmp.add(right * 10 + iy);
+                stack.push(right * 10 + iy);
+            }
+            if(down!=-1 && table[ix][down] == curMeltingColor && !tmp.has(ix*10+down)){
+                tmp.add(ix*10+down);
+                stack.push(ix*10+down);
+            }
+            if(up!=8 && table[ix][up] ==curMeltingColor && !tmp.has(ix*10+up)){
+                tmp.add(ix*10+up);
+                stack.push(ix*10+up);
+            }
+        }
+
+//        var id = 0;
+//        console.log("tmp.size:"+tmp.size);
+//        tmp.forEach(function (t, p2, p3) {
+//            console.log("tmp "+(++id)+":"+t);
+//        });
+
+        if(tmp.size>=3){
+
+            melting = true;
+            falling = false;
+            score += tmp.size*10;
+            meltingColorIDX = curMeltingColor;
+//            alert("当前消除颜色是:"+colorsum[meltingColorIDX]+",要消除的块有"+tmp.size+"个");
+            var deep = [7,7,7,7,7,7];
+            tmp.forEach(function (t, p2, p3) {
+                water.set(t,curMeltingColor);
+                var ix = Math.floor(t/10);
+                var iy = t%10;
+                meltingHole[ix]++;
+                if(iy<deep[ix]) deep[ix] = iy;
+//                console.log(meltingHole[ix]);
+//                for(var k=7;k>iy;k--) {
+//                    if ( (table[ix][k] != -1 && table[ix][k] != meltingColorIDX) || !tmp.has(t)){
+//                        ice.set(10 * ix + k,table[ix][k]);
+//                        table[ix][k] = -1;
+//                    }
+//                }
+//                table[ix][iy] = -1;
+            });
+            for(var i=0;i<6;i++){
+                for(var j=deep[i];j<8;j++){
+                    if(table[i][j]!=-1 && !tmp.has(10*i+j)){
+                        ice.set(10*i+j,table[i][j]);
+                    }
+                    table[i][j] = -1;
+                }
+            }
+            tmp.clear();
+        }
+    }
+
+
+    var drawindex = 0;//当前下落的方块索引
+    function run(ctx){
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        window.drawSix(ctx,250,6,"rgb(200,200,200)",0);
+        window.drawSix(ctx,100,6,"rgb(80,80,80)",past);
+
+        if(isStarted == false){
+			var anframe = 100;//开始动画帧数
+			if(isPushed){
+				pushtime += 1;
+			}
+			ctx.font = "150px Arial";
+			ctx.globalAlpha = 0.8-0.8/anframe*pushtime;
+			ctx.fillStyle = "rgb(80,80,80)";
+			ctx.textAlign="center";
+			ctx.fillText("H e x t r i s",0.45*window.innerWidth,0.45*window.innerHeight - 200);
+			ctx.globalAlpha = 1.0;
+			var tricolor = "rgb(" + Math.ceil(255-(255-80)/anframe*pushtime) + "," + Math.ceil(255-(255-80)/anframe*pushtime) + "," + Math.ceil(255-(255-80)/anframe*pushtime) + ")";
+			window.drawSix(ctx,20,3,tricolor,90);
+			if(pushtime>=anframe){
+				isStarted = true;
+				startTime = Date.parse(new Date())/1000;
+			}
+        }
+        else if(!isOver && !isPaused ){
+            endTime = Date.parse(new Date())/1000;
+            clock = endTime - startTime + pastTime;
+            updaterate = 0.5 + clock/250;
+            //每隔10秒，加速0.1
+            console.log("update rate:"+updaterate);
+			//暂停键
+			ctx.drawImage(pauseimg,0.9*window.innerWidth-50,0.9*window.innerHeight-50,50,50);
+			//ctx.fillRect(0.95*window.innerWidth -150,0.8*window.innerHeight,50,50); 
+			
+			//积分板
+			ctx.fillStyle = "white";
+			ctx.font = "50px Arial";
+			ctx.fillText(score,0.45*window.innerWidth,0.45*window.innerHeight+20);
+			
+            window.drawTrapezoid(ctx,0.45*window.innerWidth,posys,degs,wids,block_height,colorsum[colorindex],1.0);
+            var borderup = window.innerHeight*0.45-50*Math.sqrt(3)-0.5*block_height;
+            var currentindex = current/60%6;//求当前面向的面
+            currentindex += inittowards;
+            currentindex = currentindex%6;
+            if(currentindex < 0)
+                currentindex += 6;
+
+            var currentnum = 0;//当前面向的面上方块的个数
+            for (var i = 0;i<8;i++){
+                if(table[currentindex][i] != -1)
+                    currentnum += 1;
+            }
+            if(posys < borderup+100){
+                if(posys >= window.innerHeight*0.45-50*Math.sqrt(3)-0.5*block_height-currentnum*block_height){
+					if(currentnum >= 8)
+						isOver = true;
+					else{
+						table[currentindex][currentnum] =  colorindex;
+						remove(currentindex,currentnum);
+						drawindex +=1;
+						posys = 50;
+						wids = (window.innerHeight*0.45-posys - 0.5*block_height - 50 * Math.sqrt(3))*2/Math.sqrt(3) +100;
+						inittowards = Math.floor(Math.random()*(5+1));
+						degs = -60*inittowards;
+						colorindex = Math.floor(Math.random()*(3+1));
+					}
+                }else{
+                    posys = posys + updaterate;
+                    wids = (window.innerHeight*0.45-posys - 0.5*block_height - 50 * Math.sqrt(3))*2/Math.sqrt(3) +100;
+                }
+            }
+
+
+
+            //绘制table中的所有方块
+            for (var i = 0; i < 6;i++){//i 为面
+                for(var j = 0;j < 8;j++){//j为该面上的相应块
+                    if(table[i][j] != -1){
+                        var posy = window.innerHeight*0.45-50*Math.sqrt(3)-0.5*block_height-j*block_height;
+                        var wid = 100 + j * block_height * 2 / Math.sqrt(3);
+                        var deg = past -60*i;
+                        window.drawTrapezoid(ctx,0.45*window.innerWidth,posy,deg,wid,block_height,colorsum[table[i][j]],0.5);
+                    }
+                }
+            }
+//            console.log("melting:"+melting+",falling:"+falling+",meltingAlpha:"+meltingAlpha);
+//            console.log("melting color:"+colorsum[meltingColorIDX]);
+            //绘制消融方块,此时下落的方块在原位置
+            if(melting && water.size>0){
+                meltingAlpha -= 0.01;
+                water.forEach(function (val, key, map) {
+                    var value = key;
+                    var x = Math.floor(value/10);
+                    var y = value%10;
+                    window.drawT(ctx,x,y,val,meltingAlpha);
+                });
+                if(meltingAlpha <= 0.0){
+                    melting = false;
+                    falling = true;
+                    meltingAlpha = 1.0;
+                    water.clear();
+                }
+                ice.forEach(function (val, key, map) {
+                    var value =  key;
+                    var x = Math.floor(value/10);
+                    var y = value%10;
+                    window.drawT(ctx,x,y,val,1.0);
+                });
+            }
+            //绘制下落方块
+            if(falling && ice.size>0){
+                ice.forEach(function (val, key, map) {
+                    var value = key;
+                    var x = Math.floor(value/10);
+                    var oy = value%10;
+                    var dy = oy-meltingHole[x];
+                    var y = dy + (oy-dy)*(fallingcount/MaxFallingCount);
+                    var alpha = 0.5 + 0.5*(fallingcount/MaxFallingCount);
+                    drawT(ctx,x,y,val,alpha);
+//                    if(fallingcount  == 10 )
+//                        console.log("falling:"+fallingcount+",oriY:"+oy+",dy:"+dy+",hole:"+meltingHole[x]);
+                });
+                fallingcount--;
+                if(fallingcount<=0){
+                    ice.forEach(function (val, key, map) {
+                        var value = key;
+                        var x = Math.floor(value/10);
+                        var y = value%10-meltingHole[x];
+                        table[x][y] = val;
+                        removeSet.add(10*x+y);
+                    });
+                    ice.clear();
+                    falling = false;
+                    fallingcount = MaxFallingCount;
+                    meltingHole = [0,0,0,0,0,0];
+                    removeAll();
+//                    for(var i=0;i<6;i++){
+//                        console.log("hole"+i+":"+meltingHole[i]);
+//                    }
+                }
+                //ctx: 画布，不用变
+                //posx:不用变  用window.inner...
+                //posy: 下落的块的纵坐标 （中心点）
+                //deg: 可以换算为 对应哪个平面 0 - 5
+                //wid: 下底面宽度
+                //heig: 常量
+                //color: colorsum[table[x][y]]
+                //alpha:
+                //  var drawTrapezoid = function(ctx,posx,posy,deg,wid,heig,color,alpha){//绘制梯形，位置、旋转角、短边长、高
+                //window.drawTrapezoid(ctx,0.25*window.innerWidth,posy,deg,wid,block_height,colorsum[table[x][y]],alpha);
+            }
+//            if(!melting && !falling && removeList.length>0){
+//                var first = removeList.shift();
+//                var x = Math.floor(first/10);
+//                var y = first%10;
+//                remove(x,y);
+//            }
+//            console.log("ice:"+ice.size);
+            if(past<current)//更新底座旋转角
+                past = past + 2;
+            else if(past>current)
+                past = past - 2;
+        }
+		else if(!isOver && isPaused){//暂停
+			ctx.drawImage(playimg,0.9*window.innerWidth-50,0.9*window.innerHeight-50,50,50);
+			//积分板
+			ctx.fillStyle = "white";
+			ctx.font = "50px Arial";
+			ctx.fillText(score,0.45*window.innerWidth,0.45*window.innerHeight+20);
+			
+			window.drawTrapezoid(ctx,0.45*window.innerWidth,posys,degs,wids,block_height,colorsum[colorindex],0.5);
+			
+			ctx.font = "150px Arial";
+			ctx.fillStyle = "rgb(80,80,80)";
+			ctx.textAlign="center";
+			ctx.fillText("Game Paused",0.45*window.innerWidth,0.45*window.innerHeight - 200);
+			for (var i = 0; i < 6;i++){//i 为面
+				for(var j = 0;j < 8;j++){//j为该面上的相应块 
+					if(table[i][j] != -1){
+						var posy = window.innerHeight*0.45-50*Math.sqrt(3)-0.5*block_height-j*block_height;
+						var wid = 100 + j * block_height * 2 / Math.sqrt(3);
+						var deg = past -60*i;
+						window.drawTrapezoid(ctx,0.45*window.innerWidth,posy,deg,wid,block_height,colorsum[table[i][j]],0.3);
+					}
+				}
+			}
+		}
+		else if(isOver){//游戏结束
+			window.drawSix(ctx,250,6,"rgba(200,200,200,0.5)",0);
+			window.drawSix(ctx,100,6,"rgba(80,80,80,0.5)",past);
+			
+			ctx.font = "150px Arial";
+			ctx.globalAlpha = 0.8-0.8/anframe*pushtime;
+			ctx.fillStyle = "rgb(80,80,80)";
+			ctx.textAlign="center";
+			ctx.fillText("Game over",0.45*window.innerWidth,0.45*window.innerHeight - 200);
+			
+			for (var i = 0; i < 6;i++){//i 为面
+				for(var j = 0;j < 8;j++){//j为该面上的相应块 
+					if(table[i][j] != -1){
+						var posy = window.innerHeight*0.45-50*Math.sqrt(3)-0.5*block_height-j*block_height;
+						var wid = 100 + j * block_height * 2 / Math.sqrt(3);
+						var deg = past -60*i;
+						window.drawTrapezoid(ctx,0.45*window.innerWidth,posy,deg,wid,block_height,colorsum[table[i][j]],0.3);
+					}
+				}
+			}
+		}
+    }
+    var timer = setInterval(function(){
+        run(context);
+    }, 5);
+</script>
+</html>
