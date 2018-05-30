@@ -48,3 +48,4 @@ My playground.
   
   I've completed it with [@STverr7](https://github.com/STverr7)
   
+  <img width="400"  src="https://raw.githubusercontent.com/RoyLJH/Toys-and-fun/master/Hextris/hextris_cover.jpg"/>
