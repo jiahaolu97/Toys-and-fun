@@ -7,6 +7,7 @@ My playground.
 * [Word Ladder](#word-ladder)
 * [Maze](#maze)
 * [Krakout Game](#krakout)
+* [Hextris](#hextris)
 
 -------------------
 ### Word Ladder
@@ -39,4 +40,11 @@ My playground.
 [Krakout](https://github.com/RoyLJH/Toys-and-fun/tree/master/Krakout)
 
   OpenGL implemetion Krakout Game.
+  
+### Hextris
+[Hextris](https://github.com/RoyLJH/Toys-and-fun/tree/master/Hextris)
+
+  A elimination web game implemented by JS and HTML without using thrid-party libs.
+  
+  I've completed it with [@STverr7](https://github.com/STverr7)
   
