@@ -7,7 +7,7 @@ My playground.
 * [Word Ladder](#word-ladder)
 * [Maze](#maze)
 * [Krakout Game](#krakout)
-* [Hextris](#hextrix)
+* [Hextris](#hextris)
 
 -------------------
 ### Word Ladder
@@ -44,6 +44,7 @@ My playground.
 ### Hextris
 [Hextris](https://github.com/RoyLJH/Toys-and-fun/tree/master/Hextris)
 
-  A web game implemented by JS and HTML without using thrid-party libs.
+  A elimination web game implemented by JS and HTML without using thrid-party libs.
+  
   I've completed it with [@STverr7](https://github.com/STverr7)
-  ![](https://raw.githubusercontent.com/RoyLJH/Toys-and-fun/master/Hextris/try.gif)
+  
