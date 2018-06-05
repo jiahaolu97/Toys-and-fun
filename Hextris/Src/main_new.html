@@ -8,6 +8,14 @@
             border: 0px solid black;  margin: auto; text-align: center;position: absolute;left: 0;right: 0;
         }
     </style>
+    <audio id="bgm" autoplay="autoplay" loop="loop" preload="auto"
+           src="background.mp3">
+        你的浏览器不支持audio标签
+    </audio>
+
+    <audio id="turnAud" src ="turn_audio.mp3" type="audio/mp3">    </audio>
+    <audio id="removeAud" src ="remove_audio.mp3" type="audio/mp3">    </audio>
+
 </head>
 
 <body>
@@ -20,6 +28,57 @@
         context = canvas.getContext('2d');
     canvas.width = window.innerWidth*0.9;
     canvas.height = window.innerHeight*0.9;
+
+    var bgm = document.getElementById("bgm");
+
+    var playVoice = function (sound) {
+        var audio;
+        if(sound == 1){
+            audio = document.getElementById("turnAud");
+        }else
+            audio = document.getElementById("removeAud");
+        audio.play();
+    }
+    
+//    var playVoice = function(sound)
+//    {
+//        //sound == 1, turn    sound == 2,remove
+//        var borswer = window.navigator.userAgent.toLowerCase();
+//        if(borswer.indexOf( "ie" ) >= 0)
+//        {
+//            //IE内核浏览器
+//            var turnEmb = '<embed name="embedPlay1" src="turn_audio.mp3" autostart="true" hidden="true" loop="false"></embed>';
+//            var moveEmb = '<embed name="embedPlay2" src="remove_audio.mp3" autostart="true" hidden="true" loop="false"></embed>';
+//            if ($("body").find("embed").length <= 0){
+//                $("body").append(turnEmb);
+//                $("body").append(moveEmb);
+//            }
+//            //浏览器不支持 audio，则使用 embed 播放
+//            if(sound == 1){
+//                var turn_aud = document.embedPlay1;
+//                turn_aud.volume = 100;
+//            }
+//            else if(sound == 2){
+//                var remove_aud = document.embedPlay2;
+//                remove_aud.volume = 100;
+//            }
+//
+//        }else{
+//            //非IE内核浏览器
+//            var turnAud = "<audio id='audioPlay1' src='turn_audio.mp3' hidden='true'>";
+//            var moveAud = "<audio id='audioPlay2' src='remove_audio.mp3' hidden='true'>";
+//            if($("body").find("audio").length <= 0){
+//                $("body").append(turnAud);
+//                $("body").append(moveAud);
+//            }
+//            var path = "audioPlay" + sound;
+//            var audio = document.getElementById(path);
+//
+//            //浏览器支持 audio
+//            audio.play();
+//        }
+//    }
+
     var getDegree = function(vertices, index) {
         return 360 / vertices * (index + 0.5) + 90;
     }
@@ -103,6 +162,7 @@
 		 document.onkeydown = function(ev){
 			 if(isStarted && isOver == false && isPaused == false){
 				var oEvent=ev||event;
+				playVoice(1);
 				if(ev.keyCode==37)//向左
 				{
 					current = (current - 60);
@@ -133,8 +193,10 @@
 			}
 			else if(isStarted && isOver == false && isPaused == false){
 	//			console.log(window.innerWidth);
+                playVoice(1);
 				if(e.clientX >= (0.95*window.innerWidth - 50) && e.clientX <= (0.95*window.innerWidth) && e.clientY >= (0.9*window.innerHeight - 50) && e.clientY <= (0.9*window.innerHeight)){
                     isPaused = true;
+                    bgm.pause();
                     pastTime = clock;
                 }
 				else{
@@ -150,11 +212,13 @@
 			}else if(isStarted && isOver == false && isPaused){
 				if(e.clientX >= (0.95*window.innerWidth - 50) && e.clientX <= (0.95*window.innerWidth) && e.clientY >= (0.9*window.innerHeight - 50) && e.clientY <= (0.9*window.innerHeight)){
                     isPaused = false;
+                    bgm.play();
                     startTime = Date.parse(new Date());
                 }
 			}
 		}
 	}
+
 
     var total = 48;//总共能容纳方块的个数
     var block_height = 15;//方块的高度
@@ -243,6 +307,7 @@
                    }
                }
                if (tmp.size >= 3) {
+                   playVoice(2);
                    tmp.forEach(function (t, p, p) {
                        water.set(t,curMeltingColor);
                    });
@@ -348,7 +413,7 @@
 //        });
 
         if(tmp.size>=3){
-
+            playVoice(2);
             melting = true;
             falling = false;
             score += tmp.size*10;
@@ -439,7 +504,11 @@
             if(posys < borderup+100){
                 if(posys >= window.innerHeight*0.45-50*Math.sqrt(3)-0.5*block_height-currentnum*block_height){
 					if(currentnum >= 8)
-						isOver = true;
+					{
+                        isOver = true;
+                        bgm.pause();
+                        bgm.currentTime = 0;
+                    }
 					else{
 						table[currentindex][currentnum] =  colorindex;
 						remove(currentindex,currentnum);
