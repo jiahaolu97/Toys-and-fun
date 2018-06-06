@@ -192,7 +192,7 @@
 				}
 			}
 			else if(isStarted && isOver == false && isPaused == false){
-	//			console.log(window.innerWidth);
+	//			log(window.innerWidth);
                 playVoice(1);
 				if(e.clientX >= (0.95*window.innerWidth - 50) && e.clientX <= (0.95*window.innerWidth) && e.clientY >= (0.9*window.innerHeight - 50) && e.clientY <= (0.9*window.innerHeight)){
                     isPaused = true;
@@ -268,10 +268,12 @@
     var removeTimes = 0
 
     var removeAll = function () {
-        removeSet.forEach(function (t, p2, p3) {
+        removeSet.forEach(function (key, t, p3) {
+            console.log("set val:"+t);
            var x = Math.floor(t/10);
            var y = t%10;
            var curMeltingColor = table[x][y];
+           console.log(x+","+y);
            if(curMeltingColor!=-1 && !water.has(t)) {
                var stack = new Array();
                var tmp = new Set();
@@ -315,6 +317,7 @@
                tmp.clear();
            }
         });
+        removeSet.clear();
         if(water.size>0){
             for(var i=0;i<6;i++){
                 var downcrack = false;
@@ -352,7 +355,7 @@
 ////                    alert(ix);
 ////                }
 //                       meltingHole[ix]++;
-//                       console.log(meltingHole[ix]);
+//                       log(meltingHole[ix]);
 //                       for(var k=7;k>iy;k--) {
 //                           if ( (table[ix][k] != -1 && table[ix][k] != meltingColorIDX) || !tmp.has(t)){
 //                               ice.set(10 * ix + k,table[ix][k]);
@@ -369,7 +372,7 @@
         // 返回的是新的table数组 和 两个set 。
         // 用异步的动画方法画出消融的块。和下降的块。
         removeTimes++;
-//        console.log("remove!"+removeTimes);
+//        log("remove!"+removeTimes);
         var curMeltingColor = table[x][y];
         if(curMeltingColor == -1) return;
         var stack = new Array();
@@ -407,9 +410,9 @@
         }
 
 //        var id = 0;
-//        console.log("tmp.size:"+tmp.size);
+//        log("tmp.size:"+tmp.size);
 //        tmp.forEach(function (t, p2, p3) {
-//            console.log("tmp "+(++id)+":"+t);
+//            log("tmp "+(++id)+":"+t);
 //        });
 
         if(tmp.size>=3){
@@ -426,7 +429,7 @@
                 var iy = t%10;
                 meltingHole[ix]++;
                 if(iy<deep[ix]) deep[ix] = iy;
-//                console.log(meltingHole[ix]);
+//                log(meltingHole[ix]);
 //                for(var k=7;k>iy;k--) {
 //                    if ( (table[ix][k] != -1 && table[ix][k] != meltingColorIDX) || !tmp.has(t)){
 //                        ice.set(10 * ix + k,table[ix][k]);
@@ -478,7 +481,6 @@
             clock = endTime - startTime + pastTime;
             updaterate = 0.5 + clock/250;
             //每隔10秒，加速0.1
-            console.log("update rate:"+updaterate);
 			//暂停键
 			ctx.drawImage(pauseimg,0.9*window.innerWidth-50,0.9*window.innerHeight-50,50,50);
 			//ctx.fillRect(0.95*window.innerWidth -150,0.8*window.innerHeight,50,50); 
@@ -538,8 +540,8 @@
                     }
                 }
             }
-//            console.log("melting:"+melting+",falling:"+falling+",meltingAlpha:"+meltingAlpha);
-//            console.log("melting color:"+colorsum[meltingColorIDX]);
+//            log("melting:"+melting+",falling:"+falling+",meltingAlpha:"+meltingAlpha);
+//            log("melting color:"+colorsum[meltingColorIDX]);
             //绘制消融方块,此时下落的方块在原位置
             if(melting && water.size>0){
                 meltingAlpha -= 0.01;
@@ -573,7 +575,7 @@
                     var alpha = 0.5 + 0.5*(fallingcount/MaxFallingCount);
                     drawT(ctx,x,y,val,alpha);
 //                    if(fallingcount  == 10 )
-//                        console.log("falling:"+fallingcount+",oriY:"+oy+",dy:"+dy+",hole:"+meltingHole[x]);
+//                        log("falling:"+fallingcount+",oriY:"+oy+",dy:"+dy+",hole:"+meltingHole[x]);
                 });
                 fallingcount--;
                 if(fallingcount<=0){
@@ -582,15 +584,18 @@
                         var x = Math.floor(value/10);
                         var y = value%10-meltingHole[x];
                         table[x][y] = val;
+                        console.log(10*x+y);
                         removeSet.add(10*x+y);
+
                     });
+                    console.log(removeSet.size);
                     ice.clear();
                     falling = false;
                     fallingcount = MaxFallingCount;
                     meltingHole = [0,0,0,0,0,0];
                     removeAll();
 //                    for(var i=0;i<6;i++){
-//                        console.log("hole"+i+":"+meltingHole[i]);
+//                        log("hole"+i+":"+meltingHole[i]);
 //                    }
                 }
                 //ctx: 画布，不用变
@@ -610,7 +615,7 @@
 //                var y = first%10;
 //                remove(x,y);
 //            }
-//            console.log("ice:"+ice.size);
+//            log("ice:"+ice.size);
             if(past<current)//更新底座旋转角
                 past = past + 2;
             else if(past>current)
