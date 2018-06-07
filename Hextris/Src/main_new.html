@@ -213,7 +213,7 @@
 				if(e.clientX >= (0.95*window.innerWidth - 50) && e.clientX <= (0.95*window.innerWidth) && e.clientY >= (0.9*window.innerHeight - 50) && e.clientY <= (0.9*window.innerHeight)){
                     isPaused = false;
                     bgm.play();
-                    startTime = Date.parse(new Date());
+                    startTime = Date.parse(new Date())/1000;
                 }
 			}
 		}
@@ -269,7 +269,7 @@
 
     var removeAll = function () {
         removeSet.forEach(function (key, t, p3) {
-            console.log("set val:"+t);
+           console.log("set val:"+t);
            var x = Math.floor(t/10);
            var y = t%10;
            var curMeltingColor = table[x][y];
@@ -329,7 +329,7 @@
                         table[i][j] = -1;
                         downcrack = true;
                     }else{
-                        if(downcrack){
+                        if(downcrack && table[i][j] != -1){
                             ice.set(t,table[i][j]);
                             table[i][j] = -1;
                         }else{
@@ -339,7 +339,7 @@
                 }
             }
             melting = true;
-            falling = true;
+            falling = false;
         }
         //               if(tmp.size>=3){
 //                   melting = true;
@@ -373,6 +373,9 @@
         // 用异步的动画方法画出消融的块。和下降的块。
         removeTimes++;
 //        log("remove!"+removeTimes);
+        for(var i=0;i<6;i++){
+            meltingHole[i] = 0;
+        }
         var curMeltingColor = table[x][y];
         if(curMeltingColor == -1) return;
         var stack = new Array();
@@ -479,7 +482,7 @@
         else if(!isOver && !isPaused ){
             endTime = Date.parse(new Date())/1000;
             clock = endTime - startTime + pastTime;
-            updaterate = 0.5 + clock/250;
+            updaterate = 0.5 + clock/400;
             //每隔10秒，加速0.1
 			//暂停键
 			ctx.drawImage(pauseimg,0.9*window.innerWidth-50,0.9*window.innerHeight-50,50,50);
@@ -554,14 +557,14 @@
                 if(meltingAlpha <= 0.0){
                     melting = false;
                     falling = true;
-                    meltingAlpha = 1.0;
+                    meltingAlpha = 0.5;
                     water.clear();
                 }
                 ice.forEach(function (val, key, map) {
                     var value =  key;
                     var x = Math.floor(value/10);
                     var y = value%10;
-                    window.drawT(ctx,x,y,val,1.0);
+                    window.drawT(ctx,x,y,val,0.5);
                 });
             }
             //绘制下落方块
@@ -648,13 +651,18 @@
 		else if(isOver){//游戏结束
 			window.drawSix(ctx,250,6,"rgba(200,200,200,0.5)",0);
 			window.drawSix(ctx,100,6,"rgba(80,80,80,0.5)",past);
-			
+
+            //积分板
+            ctx.fillStyle = "white";
+            ctx.font = "50px Arial";
+            ctx.fillText(score,0.45*window.innerWidth,0.45*window.innerHeight+20);
+
 			ctx.font = "150px Arial";
 			ctx.globalAlpha = 0.8-0.8/anframe*pushtime;
 			ctx.fillStyle = "rgb(80,80,80)";
 			ctx.textAlign="center";
 			ctx.fillText("Game over",0.45*window.innerWidth,0.45*window.innerHeight - 200);
-			
+
 			for (var i = 0; i < 6;i++){//i 为面
 				for(var j = 0;j < 8;j++){//j为该面上的相应块 
 					if(table[i][j] != -1){
